@@ -1,7 +1,7 @@
 #! /bin/bash
 
 WORK_DIR=$(dirname "$0")
-VENV_DIR="$WORK_DIR/venv"
+VENV_DIR="$WORK_DIR/.venv"
 CONFIG_FILE="gunicorn_config.py"
 cd "$WORK_DIR" || exit
 

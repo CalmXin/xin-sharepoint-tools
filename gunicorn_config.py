@@ -2,6 +2,9 @@ from pathlib import Path
 
 _BASE_DIR = Path(__file__).parent
 
+# 保证日志目录存在
+Path(_BASE_DIR / 'log').mkdir(parents=True, exist_ok=True)
+
 # 项目目录
 chdir = str(_BASE_DIR.resolve())
 
