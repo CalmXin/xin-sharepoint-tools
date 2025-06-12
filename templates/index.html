@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一体化 OneDrive & SharePoint 工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+        }
+
+
+        .copy-btn {
+            position: absolute;
+            top: 50%;
+            right: 0.5rem;
+            transform: translateY(-50%);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.375rem;
+            background-color: #4B5563; /* bg-gray-600 */
+            color: white;
+            cursor: pointer;
+            border: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<div class="container mx-auto p-4 md:p-8 max-w-4xl">
+    <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">一体化 OneDrive & SharePoint 工具</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">一键获取刷新令牌和 SharePoint Site ID</p>
+    </header>
+
+    <div class="bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-md mb-8"
+         role="alert">
+        <p class="font-bold">安全警告</p>
+        <p>在此页面填写客户端密码 (Client Secret) 存在一定风险。请仅在您自己的电脑和信任的网络环境下使用此工具。</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 dark:border-gray-600">步骤 1: 应用配置 & 获取令牌</h2>
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <label for="clientId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">应用 ID
+                    (Client ID)</label>
+                <input type="text" id="clientId" placeholder="您的Azure应用ID"
+                       class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="clientSecret" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">客户端密码
+                    (Client Secret)</label>
+                <input type="password" id="clientSecret" placeholder="您的Azure应用客户端密码"
+                       class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="redirectUri" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">重定向
+                    URI (Redirect URI)</label>
+                <div class="relative">
+                    <input type="text" id="redirectUri" readonly
+                           class="w-full pl-3 pr-16 py-2 bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm">
+                    <button id="copyRedirectUriBtn" class="copy-btn">复制</button>
+                </div>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    将此URL复制到您Azure应用的Web平台重定向URI中。</p>
+            </div>
+            <div>
+                <label for="cloudEnv"
+                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">云环境</label>
+                <select id="cloudEnv"
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="global">Microsoft 全球云 (Global)</option>
+                    <option value="china">由世纪互联运营的 Microsoft Azure (21Vianet)</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-6 text-center">
+            <button id="getAuthCodeBtn"
+                    class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors text-lg">
+                开始认证
+            </button>
+        </div>
+    </div>
+
+    <div id="result-container" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hidden">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 dark:border-gray-600">令牌结果</h2>
+        <div id="spinner" class="hidden flex justify-center items-center my-4">
+            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-lg">正在从后端获取令牌...</span>
+        </div>
+        <div id="result-content"></div>
+    </div>
+
+    <div id="site-id-finder" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hidden">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 dark:border-gray-600">步骤 2: 获取 SharePoint Site ID
+            (可选)</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">使用上方获取的访问令牌来查询 Site ID。</p>
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <label for="sharepointUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SharePoint
+                    网站 URL</label>
+                <input type="url" id="sharepointUrl" placeholder="https://contoso.sharepoint.com/sites/MyTeamSite"
+                       class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        <div class="text-center mt-6">
+            <button id="getSiteIdBtn"
+                    class="px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900 transition-colors">
+                获取 Site ID
+            </button>
+        </div>
+        <div id="site-id-result-container" class="mt-6 hidden">
+            <div id="site-id-spinner" class="hidden flex justify-center items-center my-4">
+                <svg class="animate-spin -ml-1 mr-3 h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-lg">正在查询 Site ID...</span>
+            </div>
+            <div id="site-id-result-content"></div>
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
