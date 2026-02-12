@@ -5,7 +5,7 @@ WORKDIR /workspace
 COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir uvloop gunicorn
+RUN pip install --no-cache-dir gunicorn
 
 EXPOSE 8000
 
