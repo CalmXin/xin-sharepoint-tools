@@ -1,6 +1,6 @@
 services:
     app:
-        container_name: notice-server
+        container_name: xin-sharepoint-tools
         build: .
         image: calmxin/xin-sharepoint-tools:1.0
         restart: unless-stopped
