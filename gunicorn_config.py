@@ -12,10 +12,10 @@ chdir = str(_BASE_DIR.resolve())
 workers = 2
 
 # 指定每个进程开启的线程数
-threads = 16
+threads = 4
 
 # 启动模式
-worker_class = 'sync'
+worker_class = 'threads'
 
 # 绑定的ip与端口
 bind = '0.0.0.0:12345'
