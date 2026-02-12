@@ -18,7 +18,7 @@ threads = 4
 worker_class = 'threads'
 
 # 绑定的ip与端口
-bind = '0.0.0.0:12345'
+bind = '0.0.0.0:8000'
 
 # 设置访问日志和错误信息日志路径
 accesslog = f'{chdir}/log/gunicorn_access.log'

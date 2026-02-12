@@ -12,7 +12,12 @@
 
 ### 2. 运行
 
-直接通过进程守护方式运行根目录下的 `run.sh` 即可。
+```bash
+docker compose build
+docker compose up -d
+```
+
+
 
 ## Demo
 

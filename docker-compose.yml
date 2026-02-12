@@ -1,0 +1,10 @@
+services:
+    app:
+        container_name: notice-server
+        build: .
+        image: calmxin/xin-sharepoint-tools:1.0
+        restart: unless-stopped
+        ports:
+            - "28123:8000"
+        volumes:
+            - ./log:/workspace/log
