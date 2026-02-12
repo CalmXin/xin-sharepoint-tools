@@ -15,7 +15,7 @@ workers = 2
 threads = 4
 
 # 启动模式
-worker_class = 'threads'
+worker_class = 'gthread'
 
 # 绑定的ip与端口
 bind = '0.0.0.0:8000'
